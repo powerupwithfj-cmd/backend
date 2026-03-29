@@ -4,36 +4,38 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
-
+const rateLimit = require("express-rate-limit");
 dotenv.config();
 const app = express();
-
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 1000,
+  message: "Too Many Requests, Please Wait A Minute ",
+});
 app.use(cookieParser());
 
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
-  })
+  }),
 );
 
 app.use(express.json());
-
+app.use(limiter);
 app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
-  })
+  }),
 );
+const AdminUserRoutes = require("./Routes/adminUserRoutes");
+const productroutes = require("./Routes/productRoutes");
+const authrouter = require("./routes/authRoutes");
 
 app.use("/uploads", express.static("uploads"));
-
-// Routes
-const productroutes = require("./Routes/productRoutes");
 app.use("/auth/products", productroutes);
-
-const authrouter = require("./routes/authRoutes");
 app.use("/auth", authrouter);
-
+app.use("/auth/users", AdminUserRoutes);
 app.get("/", (req, res) => {
   res.send("hello from auth server");
 });

@@ -1,10 +1,6 @@
-const isAdmin = (req, res, next) => {
-      console.log("REQ.USER:", req.user);
+exports.isAdmin = (req, res, next) => {
   if (!req.user || req.user.role !== "admin") {
-    return res.status(403).json({ message: "Access only admin bro" });
+    return res.status(403).json({ message: "Admin access only" });
   }
-
   next();
 };
-
-module.exports = isAdmin;
